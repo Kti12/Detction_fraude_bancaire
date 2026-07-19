@@ -22,31 +22,44 @@ if not os.path.exists(MODEL_DIR):
 @st.cache_resource
 def load_heavy_model():
     if not os.path.exists(MODEL_PATH):
-        # ID du fichier Google Drive
+        print("[DEBUG] Le modèle n'existe pas localement. Début du téléchargement...")
         file_id = "1cszOI5vXRc8D63XWRoAoUAZFlSDsoS96"
-        
-        # URL spécifique pour contourner la vérification des gros fichiers
         url = "https://docs.google.com/uc?export=download&confirm=t&id=" + file_id
         
         try:
-            # On télécharge le fichier par morceaux (chunk) pour éviter les coupures
             with requests.get(url, stream=True) as r:
                 r.raise_for_status()
                 with open(MODEL_PATH, 'wb') as f:
                     for chunk in r.iter_content(chunk_size=8192):
                         if chunk:
                             f.write(chunk)
+            print("[DEBUG] Téléchargement du modèle réussi !")
         except Exception as e:
-            st.error(f"Erreur lors du téléchargement du modèle : {e}")
+            print(f"[DEBUG] ERREUR lors du téléchargement : {e}")
             raise e
+    else:
+        print("[DEBUG] Le modèle existe déjà localement.")
             
+    print("[DEBUG] Chargement du modèle principal avec joblib...")
     return joblib.load(MODEL_PATH)
+
+# Exécution pas à pas avec logs dans le terminal
+print("[DEBUG] --- DÉMARRAGE DU CHARGEMENT DES COMPOSANTS ---")
 model = load_heavy_model()
+
+print("[DEBUG] Chargement de le_type.pkl...")
 le_type = joblib.load(os.path.join(MODEL_DIR, "le_type.pkl"))
+
+print("[DEBUG] Chargement de le_status.pkl...")
 le_status = joblib.load(os.path.join(MODEL_DIR, "le_status.pkl"))
+
+print("[DEBUG] Chargement de le_localisation.pkl...")
 le_local = joblib.load(os.path.join(MODEL_DIR, "le_localisation.pkl"))
+
+print("[DEBUG] Chargement de scaler.pkl...")
 scaler = joblib.load(os.path.join(MODEL_DIR, "scaler.pkl"))
 
+print("[DEBUG] --- TOUS LES COMPOSANTS ONT ÉTÉ CHARGÉS AVEC SUCCÈS ---")
 #INTERFACE UTILISATEUR
 st.title("🏦 Détection de Fraude Bancaire")
 st.write("Saisissez les caractéristiques de la transaction pour évaluer le risque de fraude.")

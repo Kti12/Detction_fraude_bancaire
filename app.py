@@ -112,12 +112,13 @@ if st.button("Lancer l'analyse...", type="primary"):
 
         #résultats
         st.divider()
-        if prediction == 1:
-            st.error(f"⚠️ **Alerte : Transaction Suspecte ou Fraude potentielle !**")
-            st.metric(label="Probabilité de risque", value=f"{proba:.1%}")
-        else:
-            st.success(f"✅ **Transaction Normale**")
-            st.metric(label="Probabilité de risque", value=f"{proba:.1%}")
+        # Exemple de structure pour afficher le verdict de l'IA
+        if prediction == 1: # Si c'est une fraude
+            st.error("🚨 **Alerte : Risque élevé de fraude détecté !**")
+            st.metric(label="Statut de la transaction", value="SUSPECTE", delta="- Risque critique", delta_color="inverse")
+        else: # Si la transaction est légitime
+            st.success("✅ **Transaction validée : Aucun risque détecté.**")
+            st.metric(label="Statut de la transaction", value="LÉGITIME", delta="Sécurisée")
             
         st.progress(float(proba))
 

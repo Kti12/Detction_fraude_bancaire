@@ -4,7 +4,7 @@ import joblib
 import numpy as np
 import datetime
 import os
-import urllib.request
+import requests
 
 #CONFIGURATION
 st.set_page_config(
@@ -22,11 +22,23 @@ if not os.path.exists(MODEL_DIR):
 @st.cache_resource
 def load_heavy_model():
     if not os.path.exists(MODEL_PATH):
+        # ID du fichier Google Drive
+        file_id = "1cszOI5vXRc8D63XWRoAoUAZFlSDsoS96"
         
-        url = "https://drive.google.com/uc?export=download&id=1cszOI5vXRc8D63XWRoAoUAZFlSDsoS96"
+        # URL spécifique pour contourner la vérification des gros fichiers
+        url = "https://docs.google.com/uc?export=download&confirm=t&id=" + file_id
         
-        with st.spinner("Téléchargement du modèle de détection de fraude (10 Mo)... Veuillez patienter."):
-            urllib.request.urlretrieve(url, MODEL_PATH)
+        try:
+            # On télécharge le fichier par morceaux (chunk) pour éviter les coupures
+            with requests.get(url, stream=True) as r:
+                r.raise_for_status()
+                with open(MODEL_PATH, 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+        except Exception as e:
+            st.error(f"Erreur lors du téléchargement du modèle : {e}")
+            raise e
             
     return joblib.load(MODEL_PATH)
 model = load_heavy_model()

@@ -23,7 +23,7 @@ if not os.path.exists(MODEL_DIR):
 def load_heavy_model():
     if not os.path.exists(MODEL_PATH):
         print("Le modèle n'existe pas localement. Début du téléchargement...")
-        file_id = "1cszOI5vXRc8D63XWRoAoUAZFlSDsoS96"
+        file_id = st.secrets["DRIVE_FILE_ID"]
         url = "https://docs.google.com/uc?export=download&confirm=t&id=" + file_id
         
         try:
